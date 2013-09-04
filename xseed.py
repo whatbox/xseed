@@ -38,7 +38,7 @@ parser.add_option("-n", "--no-cross-seed", action="store_false", dest="cross", d
 
 def random_string(n):
 	"""Generate a random string of length n"""
-	return ''.join(random.choice(string.letters + string.digits) for i in xrange(n))
+	return ''.join(random.choice(string.letters + string.digits) for i in range(n))
 
 def change_announce(dict, url):
 	"""Change announce url."""
@@ -54,7 +54,7 @@ def make_unique(dict):
 
 def verbose(msg):
 	if options.verbose:
-		print msg
+		print(msg)
 
 def read_bencode(stream):
 	""" Decode a file to an object."""
@@ -102,11 +102,11 @@ def confirm(prompt=None, resp=False):
 		prompt = '%s %s/%s: ' % (prompt, 'y', 'N')
 		
 	while True:
-		ans = raw_input(prompt)
+		ans = input(prompt)
 		if not ans:
 			return resp
 		if ans not in ['y', 'Y', 'n', 'N']:
-			print 'please enter y or n.'
+			print('please enter y or n.')
 			continue
 		if ans == 'y' or ans == 'Y':
 			return True
