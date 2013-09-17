@@ -27,23 +27,23 @@ except NameError:
 	pass
 
 
-from optparse import OptionParser
+import argparse
 from bencode import bencode, bdecode
 import os, string, random
 
+parser = argparse.ArgumentParser()
 
-usage = "usage: %prog [options] filename [filename] ..."
-parser = OptionParser(usage=usage)
+parser.add_argument("-v", "--verbose", action="store_true", dest="verbose", help="switch on verbose mode")
+parser.add_argument("-e", "--edit-in-place", action="store_true", dest="replace", help="overwrite files without prompting")
+parser.add_argument("-o", "--output", dest="outfile", help="specify output filename. (can not be used if multiple files are given)")
+parser.add_argument("-d", "--directory", dest="path", help="specify a directory to save output to")
+parser.add_argument("-a", "--announce", dest="url", help="replace announce-url with the one specified")
+parser.add_argument("-p", "--private", action="store_true", dest="private", help="make torrent private")
+parser.add_argument("-n", "--no-cross-seed", action="store_false", dest="cross", default=True, help="do not add a random string to the info dict to ensure unique info hashes")
+parser.add_argument("files",  nargs='+', help='files to be modified')
 
-parser.add_option("-v", "--verbose", action="store_true", dest="verbose", help="switch on verbose mode")
-parser.add_option("-e", "--edit-in-place", action="store_true", dest="replace", help="overwrite files without prompting")
-parser.add_option("-o", "--output", dest="outfile", help="specify output filename. (can not be used if multiple files are given)")
-parser.add_option("-d", "--directory", dest="path", help="specify a directory to save output to")
-parser.add_option("-a", "--announce", dest="url", help="replace announce-url with the one specified")
-parser.add_option("-p", "--private", action="store_true", dest="private", help="make torrent private")
-parser.add_option("-n", "--no-cross-seed", action="store_false", dest="cross", default=True, help="do not add a random string to the info dict to ensure unique info hashes")
 
-(options, args) = parser.parse_args()
+args = parser.parse_args()
 
 def random_string(n):
 	"""Generate a random string of length n"""
@@ -62,7 +62,7 @@ def make_unique(dict):
 	return dict
 
 def verbose(msg):
-	if options.verbose:
+	if args.verbose:
 		print(msg)
 
 def read_bencode(stream):
@@ -122,34 +122,31 @@ def confirm(prompt=None, resp=False):
 		if ans == 'n' or ans == 'N':
 			return False
 
-# checks for presence of args
-if not args:
-	parser.error("no file(s) given")
-if len(args) > 1 and options.outfile:
+if len(args.files)>1 and args.outfile:
 	parser.error("output filename specified but multiple files given")
 
-for infile in args:
+for infile in args.files:
 	dict = read_bencode(infile)
-	if options.cross:
+	if args.cross:
 		dict = make_unique(dict)
-	if options.url:
-		dict = change_announce(dict, options.url)
-	if options.private:
+	if args.url:
+		dict = change_announce(dict, args.url)
+	if args.private:
 		dict['info']['private'] = 1
 		verbose("private set to 1")
-	if options.path and options.outfile:
-		stream = options.path + options.outfile
-		if not os.path.exists(options.path):
-			os.makedirs(options.path)
-	elif options.path:
-		stream = options.path + infile
-		if not os.path.exists(options.path):
-			os.makedirs(options.path)
-	elif options.outfile:
-		stream = options.outfile
+	if args.path and args.outfile:
+		stream = args.path + args.outfile
+		if not os.path.exists(args.path):
+			os.makedirs(args.path)
+	elif args.path:
+		stream = args.path + infile
+		if not os.path.exists(args.path):
+			os.makedirs(args.path)
+	elif args.outfile:
+		stream = args.outfile
 	else:
 		stream = infile
-	if options.replace:
+	if args.replace:
 		write_bencode(stream, dict)
 	elif os.path.exists(stream) or stream == infile:
 		choice = confirm("%s already exists. Overwrite?" % stream, True)
