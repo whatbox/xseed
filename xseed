@@ -19,9 +19,18 @@
 
 #		Modifies .torrent files
 
+
+# Use raw_input if we're still using python 2
+try:
+	input = raw_input
+except NameError:
+	pass
+
+
 from optparse import OptionParser
 from bencode import bencode, bdecode
 import os, string, random
+
 
 usage = "usage: %prog [options] filename [filename] ..."
 parser = OptionParser(usage=usage)
