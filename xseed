@@ -165,7 +165,7 @@ for infile in args.files:
         dict = make_unique(dict)
     if args.url:
         dict = change_announce(dict, args.url)
-    if args.comment:
+    if args.comment is not None:
         dict = change_comment(dict, args.comment)
     if args.private:
         dict['info']['private'] = 1
