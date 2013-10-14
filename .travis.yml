@@ -1,0 +1,8 @@
+language: python
+python:
+  - 2.7
+install:
+  - pip install pep8 --use-mirrors
+before_script:
+  - "python -m py_compile ./xseed"
+  - "pep8 --ignore=E501 ./xseed"
