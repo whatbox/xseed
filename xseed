@@ -97,26 +97,25 @@ def verbose(msg):
 def read_bencode(stream):
     """ Decode a file to an object."""
 
-    handle = open(stream, "rb")
-    dict = bdecode(handle.read())
+    with open(stream, "rb") as handle:
+        dict = bdecode(handle.read())
+
     if dict:
         verbose("dict read from '%s'" % stream)
-    if handle:
-        handle.close()
+
     return dict
 
 
 def write_bencode(stream, obj):
     """ Encode a given object to a file."""
 
-    handle = open(stream, "wb")
-    handle.write(bencode(obj))
+    with open(stream, "wb") as handle:
+        handle.write(bencode(obj))
+
     verbose("modified dict written to '%s'" % stream)
-    if handle:
-        handle.close()
 
 
-def confirm(prompt=None, resp=False):
+def confirm(prompt, resp=False):
     """prompts for yes or no response from the user. Returns True for yes and
     False for no.
 
@@ -135,13 +134,10 @@ def confirm(prompt=None, resp=False):
 
     """
 
-    if prompt is None:
-        prompt = 'Confirm'
-
     if resp:
-        prompt = '%s %s/%s: ' % (prompt, 'Y', 'n')
+        prompt = '%s Y/n: ' % prompt
     else:
-        prompt = '%s %s/%s: ' % (prompt, 'y', 'N')
+        prompt = '%s y/N: ' % prompt
 
     while True:
         ans = input(prompt)
