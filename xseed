@@ -51,7 +51,7 @@ args = parser.parse_args()
 def random_string(n):
     """Generate a random string of length n"""
 
-    return ''.join(random.choice(string.letters + string.digits) for i in range(n))
+    return ''.join(random.choice(string.ascii_letters + string.digits) for i in range(n))
 
 
 def change_announce(dict, url):
