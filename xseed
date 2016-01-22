@@ -54,39 +54,39 @@ def random_string(n):
     return ''.join(random.choice(string.ascii_letters + string.digits) for i in range(n))
 
 
-def change_announce(dict, url):
+def change_announce(torrent_dict, url):
     """Change announce url."""
 
-    dict['announce'] = url
+    torrent_dict['announce'] = url
     verbose("announce url changed to '%s'" % url)
 
-    if 'announce-list' in dict:
-        del dict['announce-list']
+    if 'announce-list' in torrent_dict:
+        del torrent_dict['announce-list']
         verbose("removed all multitracker announce urls")
 
-    return dict
+    return torrent_dict
 
 
-def change_comment(dict, comment):
+def change_comment(torrent_dict, comment):
     """Change comment."""
 
     if not comment:
-        if 'comment' in dict:
-            del dict['comment']
+        if 'comment' in torrent_dict:
+            del torrent_dict['comment']
             verbose('removed comment')
     else:
-        dict['comment'] = comment
+        torrent_dict['comment'] = comment
         verbose("comment changed to '%s'" % comment)
 
-    return dict
+    return torrent_dict
 
 
-def make_unique(dict):
-    """Add random string to info dict."""
+def make_unique(torrent_dict):
+    """Add random string to info torrent_dict."""
 
-    dict['info']['unique'] = uniquestr = random_string(32)
-    verbose("random string '%s' added to info dict" % uniquestr)
-    return dict
+    torrent_dict['info']['unique'] = uniquestr = random_string(32)
+    verbose("random string '%s' added to info torrent_dict" % uniquestr)
+    return torrent_dict
 
 
 def verbose(msg):
@@ -98,12 +98,12 @@ def read_bencode(stream):
     """ Decode a file to an object."""
 
     with open(stream, "rb") as handle:
-        dict = bdecode(handle.read())
+        torrent_dict = bdecode(handle.read())
 
-    if dict:
+    if torrent_dict:
         verbose("dict read from '%s'" % stream)
 
-    return dict
+    return torrent_dict
 
 
 def write_bencode(stream, obj):
@@ -156,15 +156,15 @@ if len(args.files) > 1 and args.outfile:
     parser.error("output filename specified but multiple files given")
 
 for infile in args.files:
-    dict = read_bencode(infile)
+    torrent_dict = read_bencode(infile)
     if args.cross:
-        dict = make_unique(dict)
+        torrent_dict = make_unique(torrent_dict)
     if args.url:
-        dict = change_announce(dict, args.url)
+        torrent_dict = change_announce(torrent_dict, args.url)
     if args.comment is not None:
-        dict = change_comment(dict, args.comment)
+        torrent_dict = change_comment(torrent_dict, args.comment)
     if args.private:
-        dict['info']['private'] = 1
+        torrent_dict['info']['private'] = 1
         verbose("private set to 1")
     if args.path and args.outfile:
         stream = args.path + args.outfile
@@ -179,12 +179,12 @@ for infile in args.files:
     else:
         stream = infile
     if args.replace:
-        write_bencode(stream, dict)
+        write_bencode(stream, torrent_dict)
     elif os.path.exists(stream) or stream == infile:
         choice = confirm("%s already exists. Overwrite?" % stream, True)
         if choice is not True:
             continue
         else:
-            write_bencode(stream, dict)
+            write_bencode(stream, torrent_dict)
     else:
-        write_bencode(stream, dict)
+        write_bencode(stream, torrent_dict)
