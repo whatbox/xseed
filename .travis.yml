@@ -1,8 +1,10 @@
 language: python
 python:
   - 2.7
+  - 3.3
+  - 3.4
 install:
-  - pip install pep8 --use-mirrors
+  - pip install pycodestyle --use-mirrors
 script:
   - "python -m py_compile ./xseed"
-  - "pep8 --ignore=E501 ./xseed"
+  - "pycodestyle --ignore=E501 ./xseed"
