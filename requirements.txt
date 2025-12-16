@@ -1,1 +1,1 @@
-bencode.py==1.2.0
+fastbencode>=0.3.1

@@ -1,0 +1,38 @@
+[lint]
+select = [
+    # pep8-naming
+    "N",
+
+    # pycodestyle
+    "E",
+    "W",
+
+    # pylint
+    "PLE",
+    "PLW",
+
+    # Pyflakes
+    "F",
+
+    # pyupgrade
+    "UP",
+
+    # flake8-bugbear
+    "B",
+
+    # flake8-bandit
+    "S",
+
+    # Prohibit catching overly broad exceptions
+    "BLE",
+
+    # flake8-simplify
+    "SIM",
+]
+ignore = [
+    # Line length warnings are more annoying than helpful
+    "E501",
+
+    # We're just randomizing the hash, there's no need for a csprng
+    "S311",
+]

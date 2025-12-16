@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xseed"
+version = "1.1.0"
+description = "Batch modify torrent files, add unique strings to their info dicts for cross-seeding"
+readme = "README.md"
+license = {text = "GPL-2.0-or-later"}
+requires-python = ">=3.8"
+authors = [
+    {name = "SuperSnout"},
+]
+maintainers = [
+    {name = "Whatbox Inc."},
+]
+keywords = ["torrent", "bittorrent", "cross-seed", "bencode"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "fastbencode>=0.3.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/whatbox/xseed"
+Repository = "https://github.com/whatbox/xseed"
+Issues = "https://github.com/whatbox/xseed/issues"
+
+[project.scripts]
+xseed = "xseed:main"
+
+[tool.setuptools]
+py-modules = ["xseed"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py38"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501"]

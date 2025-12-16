@@ -18,17 +18,8 @@
 #       MA 02110-1301, USA.
 
 #       Modifies .torrent files
-
-
-# Use raw_input if we're still using python 2
-try:
-    input = raw_input
-except NameError:
-    pass
-
-
 import argparse
-from bencode import bencode, bdecode
+from fastbencode import bencode, bdecode
 import os
 import string
 import random
@@ -48,7 +39,7 @@ parser.add_argument("files", nargs='+', help='files to be modified')
 args = parser.parse_args()
 
 
-def random_string(n):
+def random_string(n) -> str:
     """Generate a random string of length n"""
 
     return ''.join(random.choice(string.ascii_letters + string.digits) for i in range(n))
@@ -57,11 +48,11 @@ def random_string(n):
 def change_announce(torrent_dict, url):
     """Change announce url."""
 
-    torrent_dict['announce'] = url
-    verbose("announce url changed to '%s'" % url)
+    torrent_dict[b'announce'] = url.encode('utf-8')
+    verbose(f"announce url changed to '{url}'")
 
-    if 'announce-list' in torrent_dict:
-        del torrent_dict['announce-list']
+    if b'announce-list' in torrent_dict:
+        del torrent_dict[b'announce-list']
         verbose("removed all multitracker announce urls")
 
     return torrent_dict
@@ -71,12 +62,12 @@ def change_comment(torrent_dict, comment):
     """Change comment."""
 
     if not comment:
-        if 'comment' in torrent_dict:
-            del torrent_dict['comment']
+        if b'comment' in torrent_dict:
+            del torrent_dict[b'comment']
             verbose('removed comment')
     else:
-        torrent_dict['comment'] = comment
-        verbose("comment changed to '%s'" % comment)
+        torrent_dict[b'comment'] = comment.encode('utf-8')
+        verbose(f"comment changed to '{comment}'")
 
     return torrent_dict
 
@@ -84,8 +75,9 @@ def change_comment(torrent_dict, comment):
 def make_unique(torrent_dict):
     """Add random string to info torrent_dict."""
 
-    torrent_dict['info']['unique'] = uniquestr = random_string(32)
-    verbose("random string '%s' added to info torrent_dict" % uniquestr)
+    uniquestr = random_string(32)
+    torrent_dict[b'info'][b'unique'] = uniquestr.encode('utf-8')
+    verbose(f"random string '{uniquestr}' added to info torrent_dict")
     return torrent_dict
 
 
@@ -101,48 +93,26 @@ def read_bencode(stream):
         torrent_dict = bdecode(handle.read())
 
     if torrent_dict:
-        verbose("dict read from '%s'" % stream)
+        verbose(f"dict read from '{stream}'")
 
     return torrent_dict
 
 
-def write_bencode(stream, obj):
+def write_bencode(stream, obj) -> None:
     """ Encode a given object to a file."""
 
     with open(stream, "wb") as handle:
         handle.write(bencode(obj))
 
-    verbose("modified dict written to '%s'" % stream)
+    verbose(f"modified dict written to '{stream}'")
 
 
-def confirm(prompt, resp=False):
-    """prompts for yes or no response from the user. Returns True for yes and
-    False for no.
-
-    'resp' should be set to the default value assumed by the caller when
-    user simply types ENTER.
-
-    >>> confirm(prompt='Create Directory?', resp=True)
-    Create Directory? Y/n:
-    True
-    >>> confirm(prompt='Create Directory?', resp=False)
-    Create Directory? y/N:
-    False
-    >>> confirm(prompt='Create Directory?', resp=False)
-    Create Directory? y/N: y
-    True
-
-    """
-
-    if resp:
-        prompt = '%s Y/n: ' % prompt
-    else:
-        prompt = '%s y/N: ' % prompt
-
+# True by default
+def confirm(prompt: str) -> bool:
     while True:
-        ans = input(prompt)
+        ans = input(f'{prompt} Y/n: ')
         if not ans:
-            return resp
+            return True
         if ans not in ['y', 'Y', 'n', 'N']:
             print('please enter y or n.')
             continue
@@ -164,7 +134,7 @@ for infile in args.files:
     if args.comment is not None:
         torrent_dict = change_comment(torrent_dict, args.comment)
     if args.private:
-        torrent_dict['info']['private'] = 1
+        torrent_dict[b'info'][b'private'] = 1
         verbose("private set to 1")
     if args.path and args.outfile:
         stream = args.path + args.outfile
@@ -181,7 +151,8 @@ for infile in args.files:
     if args.replace:
         write_bencode(stream, torrent_dict)
     elif os.path.exists(stream) or stream == infile:
-        choice = confirm("%s already exists. Overwrite?" % stream, True)
+        choice = True
+        # choice: bool = confirm(f"{stream} already exists. Overwrite?")
         if choice is not True:
             continue
         else:
